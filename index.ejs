@@ -1,0 +1,160 @@
+<!-- views/pages/index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Send Email</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  
+   <script>
+   
+   function validateEmail(value) {
+    var regex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+    return (regex.test(value)) ? true : false;
+}
+
+ function validateEmails(string) {
+
+    var result = string.replace(/\s/g, "").split(/,|;/);
+    var errors = [];
+    for(var i = 0;i < result.length;i++) {
+        if(!validateEmail(result[i])) {
+            errors.push(result[i] + ' is not a valid email id');
+        }
+     }
+     if (errors.length > 0) {
+        alert(errors.join('\n'));
+        return false;
+     } else {
+         return true;
+     }
+
+}
+      $(document).ready(function(){
+        var strmailserver, mailto,cc,bcc,subject,emailtext;
+        $("#cmdSubmit").click(function(){
+		 //strmailserver= $("input[name='optmailserver']:checked").val();
+		 //alert(strmailserver);
+		  
+		  if ($.trim($("#txtMailTo").val()).length==0)
+		  {
+		     alert("Please enter To field");
+			 return false;
+			 
+		  }
+		  if (!validateEmail($("#txtMailTo").val()))
+		  {
+		      alert("The email address entered in the To field is invalid");
+			  return false;
+		  }
+		  
+          mailto=$("#txtMailTo").val();
+          if ($("#txtCC").val().length>0)
+		  {
+	
+			 if (!validateEmails($.trim($("#txtCC").val())))
+			 {
+			     return false;
+			 }
+		  }
+		  cc=$("#txtCC").val();
+		 		  
+          if ($("#txtBCC").val().length>0)
+		  {
+		    if (!validateEmails($.trim($("#txtBCC").val())))
+			 {
+			     return false;
+			 }
+		  }
+            bcc=$("#txtBCC").val();
+		
+		   if ($.trim($("#txtCC").val()).length==0)
+		   {
+		      cc="empty";
+		   }
+		   
+		             
+		   if ($.trim($("#txtBCC").val()).length==0)
+		   {
+		      bcc="empty";
+		   }
+		   
+		   if ($.trim($("#txtSubject").val()).length==0)
+		   {
+		      alert("Please enter the Subject");
+			  return false;
+		   }
+		   
+		   
+		    
+		   if ($.trim($("#txtMailText").val()).length==0)
+		   {
+		      alert("Please enter Email content");
+			  return false;
+		   }
+		   
+		   	 
+			subject=$("#txtSubject").val();
+            emailtext=$("#txtMailText").val();
+          
+		  
+		  // new code
+		  $.ajax({
+                url: 'http://localhost:5000/sendmail',
+                data: { strmailserver:strmailserver,mailto: mailto,cc:cc,bcc:bcc,subject:subject,emailtext:emailtext},
+                dataType: "json",
+                error: function (xhr, ajaxOptions, thrownError) {
+                   alert("Error sending mail");
+				   
+                },
+               success: function(message) {
+                 
+                 alert(message);
+              
+   },
+   type: 'POST'
+});
+		  // new code
+		  
+		  
+        });
+      });
+    </script>
+</head>
+<body>
+
+<div class="container">
+  <h2>Send Email</h2>
+
+    <div class="form-group">
+      <label for="txtMailTo">To:</label>
+      <input type="text" class="form-control" id="txtMailTo" placeholder="Enter To Email Id" name="email">
+    </div>
+    <div class="form-group">
+      <label for="txtCC">CC:</label>
+      <input type="text" class="form-control" id="txtCC" placeholder="Enter CC" name="pwd">
+    </div>
+ 
+     <div class="form-group">
+      <label for="txtBCC">BCC:</label>
+      <input type="text" class="form-control" id="txtBCC" placeholder="Enter BCC" name="pwd">
+    </div>
+	
+	   <div class="form-group">
+      <label for="txtSubject">Subject:</label>
+      <input type="text" class="form-control" id="txtSubject" placeholder="Enter Subject" name="pwd">
+    </div>
+	
+    <div class="form-group">
+      <label for="txtMailText">Content:</label>
+      <textarea class="form-control" rows="5" id="txtMailText"></textarea>
+    </div>
+    <button type="submit" class="btn btn-default" id="cmdSubmit">Submit</button>
+  
+</div>
+
+</body>
+</html>
